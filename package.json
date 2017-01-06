@@ -1,0 +1,24 @@
+{
+  "name": "js-sentiance-firehose",
+  "version": "0.0.1",
+  "description": "Javascript module for connecting to the Sentiance Firehose",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentiance/js-sentiance-firehose.git"
+  },
+  "keywords": [
+    "javascript",
+    "sentiance",
+    "firehose"
+  ],
+  "author": "Jiri Crispeyn <jiri.crispeyn@sentiance.com> (http://www.sentiance.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sentiance/js-sentiance-firehose/issues"
+  },
+  "homepage": "https://github.com/sentiance/js-sentiance-firehose#readme"
+}
