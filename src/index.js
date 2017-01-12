@@ -21,7 +21,6 @@ var SentianceFirehose = (function () {
 
   var onData = function (callback) {
     _onDataUpdate = callback;
-    this._onDataUpdate = callback;
   };
 
   var _onDataUpdate;
@@ -58,10 +57,10 @@ var SentianceFirehose = (function () {
 
             _initFirehoseConnection(id, token);
           } else {
-            console.error('Could not create subscription', { app_id: appId, stream_definition_id: streamDefinitionId, bearer_token: bearerToken });
+            throw new Error('Could not create subscription');
           }
         } else {
-          console.error('Received incorrect HTTP status', http.statusText);
+          throw new Error('Received incorrect Http status');
         }
       }
     }
