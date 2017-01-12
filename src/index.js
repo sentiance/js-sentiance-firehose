@@ -1,14 +1,21 @@
 var SentianceFirehose = (function () {
-  var connect = function (appId, streamDefinitionId, bearerToken, config) {
-    createSubscription(appId, streamDefinitionId, bearerToken);
+  var connect = function (appId, streamDefinitionId, bearerToken, userIds) {
+    _createSubscription(appId, streamDefinitionId, bearerToken, userIds);
   };
 
-  var createSubscription = function (appId, streamDefinitionId, bearerToken) {
+  var onData = function (callback) {
+    _onDataUpdate = callback;
+    this._onDataUpdate = callback;
+  };
+
+  var _onDataUpdate;
+
+  var _createSubscription = function (appId, streamDefinitionId, bearerToken, userIds) {
     var http = new XMLHttpRequest();
     var body = {
       query: '\
-        mutation($app_id: String!, $stream_definition_id: String!) {\
-          createSubscription(app_id:$app_id, stream_definition_id: $stream_definition_id) {\
+        mutation($app_id: String!, $stream_definition_id: String!, $user_ids: [String]) {\
+          createSubscription(app_id:$app_id, stream_definition_id: $stream_definition_id, user_ids: $user_ids) {\
             id\
             token\
           }\
@@ -16,7 +23,8 @@ var SentianceFirehose = (function () {
       ',
       variables: {
         app_id: appId,
-        stream_definition_id: streamDefinitionId
+        stream_definition_id: streamDefinitionId,
+        user_ids: userIds || null
       }
     }
 
@@ -29,25 +37,25 @@ var SentianceFirehose = (function () {
         var id = res.data.createSubscription.id;
         var token = res.data.createSubscription.token;
 
-        initFirehoseConnection(id, token);
+        _initFirehoseConnection(id, token);
       }
     }
     http.send(JSON.stringify(body));
   };
 
-  var initFirehoseConnection = function (id, token) {
+  var _initFirehoseConnection = function (id, token) {
     var socket = io('https://firehose.sentiance.com/');
 
     socket.on('connect', function () {
       console.log('connected');
 
-      subscribe(socket, id, token);
+      _subscribe(socket, id, token);
     });
 
     socket.on('data', function (jsonMessage) {
       var message = JSON.parse(jsonMessage);
 
-      console.log(message);
+      _onDataUpdate(message.data, message.errors, message.metadata);
     });
 
     socket.on('disconnect', function () {
@@ -59,7 +67,7 @@ var SentianceFirehose = (function () {
     });
   };
 
-  var subscribe = function (socket, id, token) {
+  var _subscribe = function (socket, id, token) {
     var subscription = {
       id: id,
       token: token
@@ -69,6 +77,7 @@ var SentianceFirehose = (function () {
   };
 
   return {
-    connect: connect
+    connect: connect,
+    onData: onData
   };
 })();
