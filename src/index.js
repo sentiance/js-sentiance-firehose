@@ -1,5 +1,21 @@
 var SentianceFirehose = (function () {
   var connect = function (appId, streamDefinitionId, bearerToken, userIds) {
+    if (!appId) {
+      throw new Error('No app id configured');
+    }
+
+    if (!streamDefinitionId) {
+      throw new Error('No stream definition id configured');
+    }
+
+    if (!bearerToken) {
+      throw new Error('No bearer token configured');
+    }
+    
+    if (!_onDataUpdate) {
+      throw new Error('No data handler configured');
+    }
+
     _createSubscription(appId, streamDefinitionId, bearerToken, userIds);
   };
 
