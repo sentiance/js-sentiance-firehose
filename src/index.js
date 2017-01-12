@@ -35,6 +35,30 @@ var SentianceFirehose = (function () {
     http.send(JSON.stringify(body));
   };
 
+  var initFirehoseConnection = function (id, token) {
+    var socket = io('https://firehose.sentiance.com/');
+
+    socket.on('connect', function () {
+      console.log('connected');
+
+      subscribe(socket, id, token);
+    });
+
+    socket.on('data', function (jsonMessage) {
+      var message = JSON.parse(jsonMessage);
+
+      console.log(message);
+    });
+
+    socket.on('disconnect', function () {
+      console.log('disonnected');
+    });
+
+    socket.on('error', function (e) {
+      console.log(e);
+    });
+  };
+
   return {
     connect: connect
   };
