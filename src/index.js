@@ -59,6 +59,15 @@ var SentianceFirehose = (function () {
     });
   };
 
+  var subscribe = function (socket, id, token) {
+    var subscription = {
+      id: id,
+      token: token
+    };
+
+    socket.emit('subscribe-v1', subscription);
+  };
+
   return {
     connect: connect
   };
