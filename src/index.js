@@ -32,12 +32,21 @@ var SentianceFirehose = (function () {
     http.setRequestHeader('Content-Type', 'application/json');
     http.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
     http.onreadystatechange = function () {
-      if (http.readyState === 4 && http.status === 200) {
-        var res = JSON.parse(http.responseText);
-        var id = res.data.createSubscription.id;
-        var token = res.data.createSubscription.token;
+      if (http.readyState === 4) {
+        if (http.status === 200) {
+          var res = JSON.parse(http.responseText);
 
-        _initFirehoseConnection(id, token);
+          if (res.data && res.data.createSubscription) {
+            var id = res.data.createSubscription.id;
+            var token = res.data.createSubscription.token;
+
+            _initFirehoseConnection(id, token);
+          } else {
+            console.error('Could not create subscription', { app_id: appId, stream_definition_id: streamDefinitionId, bearer_token: bearerToken });
+          }
+        } else {
+          console.error('Received incorrect HTTP status', http.statusText);
+        }
       }
     }
     http.send(JSON.stringify(body));
@@ -59,7 +68,7 @@ var SentianceFirehose = (function () {
     });
 
     socket.on('disconnect', function () {
-      console.log('disonnected');
+      console.log('disconnected');
     });
 
     socket.on('error', function (e) {
