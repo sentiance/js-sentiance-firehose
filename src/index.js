@@ -3,18 +3,39 @@ var SentianceFirehose = (function () {
   var socket;
   var delay = 1000;
 
+  /**
+   * Set up a connection to the stream
+   * @param {String} appId App identifier
+   * @param {String} streamDefinitionId Stream identifier
+   * @param {String} bearerToken Authorization token
+   * @param {Array<String>} [userIds] List of user id's you want to subscribe on
+   */
   var connect = function (appId, streamDefinitionId, bearerToken, userIds) {
     setTimeout(_reconnect(appId, streamDefinitionId, bearerToken, userIds));
   };
 
+  /**
+   * Disconnect from the stream
+   */
   var disconnect = function () {
     socket.disconnect();
   }
 
+  /**
+   * Called on every data update the stream emits
+   * @param {Function} callback Custom data handling function
+   */
   var onData = function (callback) {
     onDataUpdate = callback;
   };
 
+  /**
+   * Reconnect to the stream if parameters are set
+   * @param {String} appId App identifier
+   * @param {String} streamDefinitionId Stream identifier
+   * @param {String} bearerToken Authorization token
+   * @param {Array<String>} [userIds] List of user id's you want to subscribe on
+   */
   var _reconnect = function (appId, streamDefinitionId, bearerToken, userIds) {
     if (!appId) {
       throw new Error('No app id configured');
@@ -35,6 +56,13 @@ var SentianceFirehose = (function () {
     _createSubscription(appId, streamDefinitionId, bearerToken, userIds);
   };
 
+  /**
+   * Schedule reconnect with exponential backoff strategy
+   * @param {String} appId App identifier
+   * @param {String} streamDefinitionId Stream identifier
+   * @param {String} bearerToken Authorization token
+   * @param {Array<String>} [userIds] List of user id's you want to subscribe on
+   */
   var _scheduleReconnect = function (appId, streamDefinitionId, bearerToken, userIds) {
     delay = delay * 2;
 
@@ -43,6 +71,15 @@ var SentianceFirehose = (function () {
     }, delay);
   };
 
+  /**
+   * Create a new subscription to the stream
+   * Get subscription id and token with GraphQL
+   * Initialize stream connection
+   * @param {String} appId App identifier
+   * @param {String} streamDefinitionId Stream identifier
+   * @param {String} bearerToken Authorization token
+   * @param {Array<String>} [userIds] List of user id's you want to subscribe on
+   */
   var _createSubscription = function (appId, streamDefinitionId, bearerToken, userIds) {
     var http = new XMLHttpRequest();
     var body = {
@@ -85,6 +122,12 @@ var SentianceFirehose = (function () {
     http.send(JSON.stringify(body));
   };
 
+  /**
+   * Set up stream with socket.io
+   * Handle stream event listeners
+   * @param {String} id Subscription id
+   * @param {String} token Subscription token
+   */
   var _initFirehoseConnection = function (id, token) {
     socket = io('https://firehose.sentiance.com/');
 
@@ -109,6 +152,12 @@ var SentianceFirehose = (function () {
     });
   };
 
+  /**
+   * Set up subscription to receive events
+   * @param {Object} socket socket.io object
+   * @param {String} id Subscription id
+   * @param {String} token Subscription token
+   */
   var _subscribe = function (socket, id, token) {
     var subscription = {
       id: id,
