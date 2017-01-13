@@ -1,5 +1,16 @@
 var SentianceFirehose = (function () {
+  var onDataUpdate;
+  var delay = 1000;
+
   var connect = function (appId, streamDefinitionId, bearerToken, userIds) {
+    setTimeout(_reconnect(appId, streamDefinitionId, bearerToken, userIds));
+  };
+
+  var onData = function (callback) {
+    onDataUpdate = callback;
+  };
+
+  var _reconnect = function (appId, streamDefinitionId, bearerToken, userIds) {
     if (!appId) {
       throw new Error('No app id configured');
     }
@@ -12,18 +23,20 @@ var SentianceFirehose = (function () {
       throw new Error('No bearer token configured');
     }
     
-    if (!_onDataUpdate) {
+    if (!onDataUpdate) {
       throw new Error('No data handler configured');
     }
 
     _createSubscription(appId, streamDefinitionId, bearerToken, userIds);
   };
 
-  var onData = function (callback) {
-    _onDataUpdate = callback;
-  };
+  var _scheduleReconnect = function (appId, streamDefinitionId, bearerToken, userIds) {
+    delay = delay * 2;
 
-  var _onDataUpdate;
+    setTimeout(function () {
+      _reconnect(appId, streamDefinitionId, bearerToken, userIds);
+    }, delay);
+  };
 
   var _createSubscription = function (appId, streamDefinitionId, bearerToken, userIds) {
     var http = new XMLHttpRequest();
@@ -41,7 +54,7 @@ var SentianceFirehose = (function () {
         stream_definition_id: streamDefinitionId,
         user_ids: userIds || null
       }
-    }
+    };
 
     http.open('POST', 'https://api.sentiance.com/v2/gql', true);
     http.setRequestHeader('Content-Type', 'application/json');
@@ -57,10 +70,10 @@ var SentianceFirehose = (function () {
 
             _initFirehoseConnection(id, token);
           } else {
-            throw new Error('Could not create subscription');
+            _scheduleReconnect(appId, streamDefinitionId, bearerToken, userIds);
           }
         } else {
-          throw new Error('Received incorrect Http status');
+          _scheduleReconnect(appId, streamDefinitionId, bearerToken, userIds);
         }
       }
     }
@@ -71,7 +84,7 @@ var SentianceFirehose = (function () {
     var socket = io('https://firehose.sentiance.com/');
 
     socket.on('connect', function () {
-      console.log('connected');
+      // console.log('Firehose: socket connected');
 
       _subscribe(socket, id, token);
     });
@@ -79,15 +92,15 @@ var SentianceFirehose = (function () {
     socket.on('data', function (jsonMessage) {
       var message = JSON.parse(jsonMessage);
 
-      _onDataUpdate(message.data, message.errors, message.metadata);
+      onDataUpdate(message.data, message.errors, message.metadata);
     });
 
     socket.on('disconnect', function () {
-      console.log('disconnected');
+      // console.info('Firehose: socket disconnected');
     });
 
     socket.on('error', function (e) {
-      console.log(e);
+      // console.warn('Firehose: socket error', e);
     });
   };
 
