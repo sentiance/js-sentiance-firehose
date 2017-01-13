@@ -1,10 +1,15 @@
 var SentianceFirehose = (function () {
   var onDataUpdate;
+  var socket;
   var delay = 1000;
 
   var connect = function (appId, streamDefinitionId, bearerToken, userIds) {
     setTimeout(_reconnect(appId, streamDefinitionId, bearerToken, userIds));
   };
+
+  var disconnect = function () {
+    socket.disconnect();
+  }
 
   var onData = function (callback) {
     onDataUpdate = callback;
@@ -81,7 +86,7 @@ var SentianceFirehose = (function () {
   };
 
   var _initFirehoseConnection = function (id, token) {
-    var socket = io('https://firehose.sentiance.com/');
+    socket = io('https://firehose.sentiance.com/');
 
     socket.on('connect', function () {
       // console.log('Firehose: socket connected');
@@ -115,6 +120,7 @@ var SentianceFirehose = (function () {
 
   return {
     connect: connect,
+    disconnect: disconnect,
     onData: onData
   };
 })();
