@@ -1,0 +1,15 @@
+{
+  "name": "js-sentiance-firehose",
+  "description": "Javascript module for connecting to the Sentiance Firehose",
+  "main": "dist/sentiance-firehose.js",
+  "authors": [
+    "Jiri Crispeyn <jiri.crispeyn@sentiance.com> (http://www.sentiance.com/)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "javascript",
+    "sentiance",
+    "firehose"
+  ],
+  "homepage": "https://github.com/sentiance/js-sentiance-firehose"
+}
