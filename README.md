@@ -7,6 +7,11 @@ Install module using npm:
 npm install js-sentiance-firehose --save
 ```
 
+Or using bower:
+```bash
+bower install js-sentiance-firehose --save
+```
+
 Include `dist/js-sentiance-firehose.js` or `dist/js-sentiance-firehose.min.js` to your project:
 ```html
 <script src="js-sentiance-firehose.js"></script>
