@@ -20,7 +20,7 @@ Include `dist/js-sentiance-firehose.js` or `dist/js-sentiance-firehose.min.js` t
 ## Example
 ```javascript
 // connect to the stream
-SentianceFirehose.connect(appId, streanDefinitionId, bearerToken, userIds);
+SentianceFirehose.connect(appId, streamDefinitionId, bearerToken, userIds);
 
 // stream event listener
 SentianceFirehose.onData(onDataUpdate);
