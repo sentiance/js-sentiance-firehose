@@ -18,7 +18,9 @@ var SentianceFirehose = (function () {
    * Disconnect from the stream
    */
   var disconnect = function () {
-    socket.disconnect();
+    if (socket && socket.connected) {
+      socket.disconnect();
+    }
   }
 
   /**
