@@ -1,6 +1,6 @@
 {
   "name": "js-sentiance-firehose",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Javascript module for connecting to the Sentiance Firehose",
   "main": "dist/sentiance-firehose.js",
   "scripts": {
