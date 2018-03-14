@@ -175,3 +175,5 @@ var SentianceFirehose = (function () {
     onData: onData
   };
 })();
+
+module.exports = SentianceFirehose
