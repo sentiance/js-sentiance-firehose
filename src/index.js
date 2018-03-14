@@ -1,3 +1,7 @@
+'use strict'
+
+const io = require('socket.io-client')
+
 const SentianceFirehose = (function () {
     let onDataUpdate;
     let socket;
